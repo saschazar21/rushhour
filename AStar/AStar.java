@@ -1,5 +1,8 @@
 package AStar;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import Heuristics.Heuristic;
 
 /**
@@ -17,15 +20,41 @@ public class AStar {
 
     /** The solution path is stored here */
     public State[] path;
+    
+    private List<Node> open = new ArrayList<Node>();
+    private List<Node> closed = new ArrayList<Node>();
 
     /**
      * This is the constructor that performs A* search to compute a
      * solution for the given puzzle using the given heuristic.
      */
     public AStar(Puzzle puzzle, Heuristic heuristic) {
+    	open.add(puzzle.getInitNode());
+    	
+    	while(!open.isEmpty()) {
+    		Node current = open.remove(0); // TODO: open list should be sorted
+    		
+    		if (current.getState().isGoal()) {
+    			// TODO: save solution path in path array
+    			break;
+    		}
+    		
+    		for (Node successor : current.expand()) {
+    			if (shouldSkip(successor)) {
+    				continue;
+    			}
+    			
+    			open.add(successor);
+    		}
 
-	// your code here
+    		closed.add(current);
+    	}
 
+    }
+    
+    private boolean shouldSkip(Node successor) {
+    	// TODO: http://web.mit.edu/eranki/www/tutorials/search/
+    	return closed.contains(successor) || open.contains(successor);
     }
 
 }
