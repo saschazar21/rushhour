@@ -28,8 +28,13 @@ public class AStar {
      * solution for the given puzzle using the given heuristic.
      */
     public AStar(Puzzle puzzle, Heuristic heuristic) {
-    	HeuristicsNode root = new HeuristicsNode(puzzle.getInitNode());
-    	open.add(root);
+    	
+    	// Initialize root node w/ heuristics and path costs
+    	int h = heuristic.getValue(puzzle.getInitNode().getState());
+    	int g = puzzle.getInitNode().getDepth();
+    	HeuristicsNode root = new HeuristicsNode(puzzle.getInitNode(), g, h);
+    	
+    	open.add(root);	// Add the root node to the open list
     	
     	while(!open.isEmpty()) {
     		Node current = open.remove(0); // TODO: open list should be sorted
@@ -60,7 +65,11 @@ public class AStar {
     				continue;
     			}
     			
-    			open.add(new HeuristicsNode(successor));
+    			// Add the successor of current node to open list,
+    			// Set path costs and heuristics accordingly
+    			h = heuristic.getValue(successor.getState());
+    			g = successor.getDepth();
+    			open.add(new HeuristicsNode(successor, g, h));
     		}
 
     		closed.add(new HeuristicsNode(current));
