@@ -1,6 +1,6 @@
 package AStar;
 
-public class HeuristicsNode extends Node {
+public class HeuristicsNode extends Node implements Comparable<HeuristicsNode> {
 	
 	private int f;
 	private int g;
@@ -83,5 +83,13 @@ public class HeuristicsNode extends Node {
 	 */
 	public int getF() {
 		return f;
+	}
+
+	/**
+	 * Comparator
+	 */
+	@Override
+	public int compareTo(HeuristicsNode o) {
+		return this.getHeuristic() - o.getHeuristic();
 	}
 }

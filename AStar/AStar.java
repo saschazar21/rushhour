@@ -1,6 +1,7 @@
 package AStar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import Heuristics.Heuristic;
@@ -29,6 +30,9 @@ public class AStar {
      */
     public AStar(Puzzle puzzle, Heuristic heuristic) {
     	
+    	// Set sort variable, to indicate if open list needs to be sorted
+    	boolean sort = false;
+    	
     	// Initialize root node w/ heuristics and path costs
     	int h = heuristic.getValue(puzzle.getInitNode().getState());
     	int g = puzzle.getInitNode().getDepth();
@@ -37,7 +41,13 @@ public class AStar {
     	open.add(root);	// Add the root node to the open list
     	
     	while(!open.isEmpty()) {
-    		Node current = open.remove(0); // TODO: open list should be sorted
+    		
+    		if (sort) {					// Check if open list needs to be sorted,
+    			Collections.sort(open);	// If so, do it.
+    			sort = false;
+    		}					
+    		
+    		Node current = open.remove(0);
     		
     		if (current.getState().isGoal()) {
     			// TODO: Check if correct: save solution path in path array
@@ -51,10 +61,10 @@ public class AStar {
     			
     			// Get state for every node and store it in the path array,
     			// then override current path node with its parent node until parent is null.
-    			do  {
+    			while (pathNode != null) {
     				path[pathNode.getDepth()] = pathNode.getState();
     				pathNode = pathNode.getParent();
-    			} while (pathNode.getParent() != null);
+    			}
     			
     			// Break while loop when finished.
     			break;
@@ -70,6 +80,7 @@ public class AStar {
     			h = heuristic.getValue(successor.getState());
     			g = successor.getDepth();
     			open.add(new HeuristicsNode(successor, g, h));
+    			sort = true;
     		}
 
     		closed.add(new HeuristicsNode(current));
