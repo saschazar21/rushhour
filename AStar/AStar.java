@@ -1,6 +1,7 @@
 package AStar;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import Heuristics.Heuristic;
@@ -20,21 +21,52 @@ public class AStar {
     /** The solution path is stored here */
     public State[] path;
     
-    private List<Node> open = new ArrayList<Node>();
-    private List<Node> closed = new ArrayList<Node>();
+    private List<HeuristicsNode> open = new ArrayList<HeuristicsNode>();
+    private List<HeuristicsNode> closed = new ArrayList<HeuristicsNode>();
 
     /**
      * This is the constructor that performs A* search to compute a
      * solution for the given puzzle using the given heuristic.
      */
     public AStar(Puzzle puzzle, Heuristic heuristic) {
-    	open.add(puzzle.getInitNode());
+    	
+    	// Set sort variable, to indicate if open list needs to be sorted
+    	boolean sort = false;
+    	
+    	// Initialize root node w/ heuristics and path costs
+    	int h = heuristic.getValue(puzzle.getInitNode().getState());
+    	int g = puzzle.getInitNode().getDepth();
+    	HeuristicsNode root = new HeuristicsNode(puzzle.getInitNode(), g, h);
+    	
+    	open.add(root);	// Add the root node to the open list
     	
     	while(!open.isEmpty()) {
-    		Node current = open.remove(0); // TODO: open list should be sorted
+    		
+    		if (sort) {					// Check if open list needs to be sorted,
+    			Collections.sort(open);	// If so, do it.
+    			sort = false;
+    		}					
+    		
+    		Node current = open.remove(0);
     		
     		if (current.getState().isGoal()) {
-    			// TODO: save solution path in path array
+    			// TODO: Check if correct: save solution path in path array
+    			
+    			// Set the path array size to depth of goal state;
+    			// The +1 should be necessary to also include root node.
+    			path = new State[current.getDepth() + 1];
+    			
+    			// Set the current node to pathNode
+    			Node pathNode = current;
+    			
+    			// Get state for every node and store it in the path array,
+    			// then override current path node with its parent node until parent is null.
+    			while (pathNode != null) {
+    				path[pathNode.getDepth()] = pathNode.getState();
+    				pathNode = pathNode.getParent();
+    			}
+    			
+    			// Break while loop when finished.
     			break;
     		}
     		
@@ -43,10 +75,15 @@ public class AStar {
     				continue;
     			}
     			
-    			open.add(successor);
+    			// Add the successor of current node to open list,
+    			// Set path costs and heuristics accordingly
+    			h = heuristic.getValue(successor.getState());
+    			g = successor.getDepth();
+    			open.add(new HeuristicsNode(successor, g, h));
+    			sort = true;
     		}
 
-    		closed.add(current);
+    		closed.add(new HeuristicsNode(current));
     	}
 
     }
