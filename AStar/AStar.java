@@ -34,8 +34,8 @@ public class AStar {
     	boolean sort = false;
     	
     	// Initialize root node w/ heuristics and path costs
-    	int h = heuristic.getValue(puzzle.getInitNode().getState());
     	int g = puzzle.getInitNode().getDepth();
+    	int h = heuristic.getValue(puzzle.getInitNode().getState());
     	HeuristicsNode root = new HeuristicsNode(puzzle.getInitNode(), g, h);
     	
     	open.add(root);	// Add the root node to the open list
@@ -47,7 +47,7 @@ public class AStar {
     			sort = false;
     		}					
     		
-    		Node current = open.remove(0);
+    		HeuristicsNode current = open.remove(0);
     		
     		if (current.getState().isGoal()) {
     			// TODO: Check if correct: save solution path in path array
@@ -66,24 +66,27 @@ public class AStar {
     				pathNode = pathNode.getParent();
     			}
     			
-    			// Break while loop when finished.
-    			break;
+    			// We found a solution, stop.
+    			return;
     		}
     		
+    		closed.add(current);
+    		
     		for (Node successor : current.expand()) {
-    			if (shouldSkip(successor)) {
+    			g = successor.getDepth();
+    			h = heuristic.getValue(successor.getState());
+    			HeuristicsNode heuristicsSuccessor = new HeuristicsNode(successor, g, h);
+    			
+    			if (shouldSkip(heuristicsSuccessor)) {
     				continue;
     			}
     			
     			// Add the successor of current node to open list,
     			// Set path costs and heuristics accordingly
-    			h = heuristic.getValue(successor.getState());
-    			g = successor.getDepth();
-    			open.add(new HeuristicsNode(successor, g, h));
+    			open.add(heuristicsSuccessor);
     			sort = true;
     		}
 
-    		closed.add(new HeuristicsNode(current));
     	}
 
     }
