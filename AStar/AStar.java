@@ -1,7 +1,6 @@
 package AStar;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import Heuristics.Heuristic;
@@ -21,7 +20,7 @@ public class AStar {
     /** The solution path is stored here */
     public State[] path;
     
-    private List<HNode> open = new ArrayList<HNode>();
+    private SortableList<HNode> open = new SortableList<HNode>();
     private List<HNode> closed = new ArrayList<HNode>();
 
     /**
@@ -29,9 +28,6 @@ public class AStar {
      * solution for the given puzzle using the given heuristic.
      */
     public AStar(Puzzle puzzle, Heuristic heuristic) {
-    	
-    	// Set sort variable, to indicate if open list needs to be sorted
-    	boolean sort = false;
     	
     	// Initialize root node w/ heuristics and path costs
     	int h = heuristic.getValue(puzzle.getInitNode().getState());
@@ -41,10 +37,8 @@ public class AStar {
     	
     	while(!open.isEmpty()) {
     		
-    		if (sort) {					// Check if open list needs to be sorted,
-    			Collections.sort(open);	// If so, do it.
-    			sort = false;
-    		}					
+    		// Only performs sort if list was changed
+    		open.sort();				
     		
     		HNode current = open.remove(0);
     		
@@ -83,7 +77,6 @@ public class AStar {
     			// Add the successor of current node to open list,
     			// Set path costs and heuristics accordingly
     			open.add(hSuccessor);
-    			sort = true;
     		}
 
     	}
