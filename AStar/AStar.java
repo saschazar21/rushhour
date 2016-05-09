@@ -21,8 +21,8 @@ public class AStar {
     /** The solution path is stored here */
     public State[] path;
     
-    private List<HeuristicsNode> open = new ArrayList<HeuristicsNode>();
-    private List<HeuristicsNode> closed = new ArrayList<HeuristicsNode>();
+    private List<HNode> open = new ArrayList<HNode>();
+    private List<HNode> closed = new ArrayList<HNode>();
 
     /**
      * This is the constructor that performs A* search to compute a
@@ -35,8 +35,7 @@ public class AStar {
     	
     	// Initialize root node w/ heuristics and path costs
     	int h = heuristic.getValue(puzzle.getInitNode().getState());
-    	int g = puzzle.getInitNode().getDepth();
-    	HeuristicsNode root = new HeuristicsNode(puzzle.getInitNode(), g, h);
+    	HNode root = new HNode(puzzle.getInitNode(), h);
     	
     	open.add(root);	// Add the root node to the open list
     	
@@ -47,7 +46,7 @@ public class AStar {
     			sort = false;
     		}					
     		
-    		Node current = open.remove(0);
+    		HNode current = open.remove(0);
     		
     		if (current.getState().isGoal()) {
     			// TODO: Check if correct: save solution path in path array
@@ -66,29 +65,32 @@ public class AStar {
     				pathNode = pathNode.getParent();
     			}
     			
-    			// Break while loop when finished.
-    			break;
+    			// We found a solution, stop.
+    			return;
     		}
     		
+    		closed.add(current);
+    		
     		for (Node successor : current.expand()) {
-    			if (shouldSkip(successor)) {
+
+    			h = heuristic.getValue(successor.getState());
+    			HNode hSuccessor = new HNode(successor, h);
+    			
+    			if (shouldSkip(hSuccessor)) {
     				continue;
     			}
     			
     			// Add the successor of current node to open list,
     			// Set path costs and heuristics accordingly
-    			h = heuristic.getValue(successor.getState());
-    			g = successor.getDepth();
-    			open.add(new HeuristicsNode(successor, g, h));
+    			open.add(hSuccessor);
     			sort = true;
     		}
 
-    		closed.add(new HeuristicsNode(current));
     	}
 
     }
     
-    private boolean shouldSkip(Node successor) {
+    private boolean shouldSkip(HNode successor) {
     	// TODO: http://web.mit.edu/eranki/www/tutorials/search/
     	return closed.contains(successor) || open.contains(successor);
     }
