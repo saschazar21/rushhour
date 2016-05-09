@@ -13,7 +13,7 @@ import AStar.State;
  */
 public class AdvancedHeuristic implements Heuristic {
 
-	ArrayList<Integer> visitedCars;
+	ArrayList<Integer> visited;
 	private Puzzle puzzle;
 	private int numCars;
 	
@@ -21,9 +21,9 @@ public class AdvancedHeuristic implements Heuristic {
 	 * This is the required constructor, which must be of the given form.
 	 */
 	public AdvancedHeuristic(Puzzle puzzle) {
-		this.visitedCars = new ArrayList<Integer>();
 		this.puzzle = puzzle;
 		this.numCars = this.puzzle.getNumCars();
+		this.visited = new ArrayList<Integer>();
 	}
 
 	/**
@@ -31,24 +31,24 @@ public class AdvancedHeuristic implements Heuristic {
 	 * state.
 	 */
 	public int getValue(State state) {
-		this.visitedCars.clear();
+		this.visited.clear();
 		
 		if (state.isGoal()) {
 			return 0;
 		}
 		
-		return this.getMinimumRequiredMoves(state, 0) + 1;
+		return this.getMinimumRequiredMoves(state, 0);
 
 	}
 	
 	private int getMinimumRequiredMoves(State state, int v) {
-		if (visitedCars.contains(v)) {
+		if (visited.contains(v)) {
 			return 0;
 		}
 		
-		visitedCars.add(v);
+		visited.add(v);
 		
-		int value = 0;
+		int value = 1;
 		
 		int carPos = state.getVariablePosition(0);
 		int carPosFront = carPos + this.puzzle.getCarSize(v) - 1;
@@ -67,14 +67,11 @@ public class AdvancedHeuristic implements Heuristic {
 				continue;
 			}
 			
-			// if i is blocking v
-			// => value += getMinimumRequiredMoves(state, i);
-			
 			int currentCarPos = state.getVariablePosition(i);
 			int currentCarPosFront = currentCarPos + this.puzzle.getCarSize(i);
 			
 			if (carPosFixed >= currentCarPos && carPosFixed < currentCarPosFront) {
-				value += getMinimumRequiredMoves(state, i) + 1;
+				value += getMinimumRequiredMoves(state, i);
 			}
 			
 		}
