@@ -42,7 +42,7 @@ public class RushHour {
 	Puzzle[] puzzles = Puzzle.readPuzzlesFromFile(filename);
 
 		String[] heuristic_names = null;
-		int num_puzzles = puzzles.length;
+		int num_puzzles = 5; // puzzles.length;
 		int num_heuristics = 0;
 
 		int[][] num_expanded = null;
