@@ -2,17 +2,11 @@ package AStar;
 
 public class HNode extends Node implements Comparable<HNode> {
 	
-	// private Node node;
 	private int f;
-	private int g;
-	private int h;
 	
 	public HNode(Node node, int h) {
 		super(node.getState(), node.getDepth(), node.getParent());
-		// this.node = node;
-		this.h = h;
-		this.g = node.getDepth();
-		this.f = this.g + this.h;
+		this.f = node.getDepth() + h;
 		
 	}
 
@@ -38,6 +32,7 @@ public class HNode extends Node implements Comparable<HNode> {
 		if (this == obj) {
 			return true;
 		}
+		
 		
 		if (obj instanceof Node || obj instanceof HNode) {
 			return ((Node) obj).getState().equals(this.getState());
