@@ -13,16 +13,18 @@ import AStar.State;
 public class BlockingHeuristic implements Heuristic {
 	
 	private Puzzle puzzle;		// The current puzzle to evaluate heuristics on
+	private int numCars;        // The total number of cars on the jam
 	private int carPosFixed;	// The initial fixed position of our car
-	private int blocking;		// No of blocking cars in the way of our car
+	private int carSize;		// The size of our car
 
 	/**
 	 * This is the required constructor, which must be of the given form.
 	 */
 	public BlockingHeuristic(Puzzle puzzle) {
-		
 		this.puzzle = puzzle;							// Store current puzzle
+		this.numCars = this.puzzle.getNumCars();        // Get the total number of cars
 		this.carPosFixed = puzzle.getFixedPosition(0);	// Get fixed position of our car.
+		this.carSize = this.puzzle.getCarSize(0);  // Get size of our car
 	}
 
 	/**
@@ -30,20 +32,17 @@ public class BlockingHeuristic implements Heuristic {
 	 * state.
 	 */
 	public int getValue(State state) {
-		
 		// Return 0, if state equals goal state (No further heuristics needed)
 		if (state.isGoal()) {
 			return 0;
 		}
 		
-		this.blocking = 1;	// At least one car is still blocking our way.
+		int blocking = 1; 								// At least one car is still blocking our way.
 		
 		// Calculate the outermost position of our car,
-		// -1 needed due to variable position not being identified as 0 otherwise
-		int carPosFront = state.getVariablePosition(0) + (this.puzzle.getCarSize(0) - 1);
+		int carPosFront = state.getVariablePosition(0) + this.carSize - 1;
 		
-		int numCars = this.puzzle.getNumCars();
-		for (int i = 0; i < numCars; i++) {
+		for (int i = 1; i < this.numCars; i++) {
 			
 			if (!this.puzzle.getCarOrient(i)) {			// Car is horizontally aligned as well,
 				continue;								// does not block our car.
@@ -53,7 +52,7 @@ public class BlockingHeuristic implements Heuristic {
 				continue;								// Car is behind of our car, does not block.
 			}
 			
-			/* Now calculate how many cars are really standing between us and the goal, idea:
+			/* Now calculate how many cars are really standing between us and the goal:
 			* -----------------
 			* 
 			* Check on behalf of our car's point of view, if possibly blocking car reaches from our
@@ -63,11 +62,13 @@ public class BlockingHeuristic implements Heuristic {
 			*/
 			int currentCarPos = state.getVariablePosition(i);
 			int currentCarPosFront = currentCarPos + this.puzzle.getCarSize(i);
-			if (currentCarPosFront >= this.carPosFixed && currentCarPos <= this.carPosFixed) {
-				this.blocking++;
+			
+			if (this.carPosFixed >= currentCarPos && this.carPosFixed < currentCarPosFront) {
+				blocking++;
 			}
 		}
-		return this.blocking;
+		
+		return blocking;
 	}
 
 }

@@ -1,5 +1,7 @@
 package Heuristics;
 
+import java.util.ArrayList;
+
 import AStar.Puzzle;
 import AStar.State;
 
@@ -11,13 +13,17 @@ import AStar.State;
  */
 public class AdvancedHeuristic implements Heuristic {
 
+	ArrayList<Integer> visited;
+	private Puzzle puzzle;
+	private int numCars;
+	
 	/**
 	 * This is the required constructor, which must be of the given form.
 	 */
 	public AdvancedHeuristic(Puzzle puzzle) {
-
-		// your code here
-
+		this.puzzle = puzzle;
+		this.numCars = this.puzzle.getNumCars();
+		this.visited = new ArrayList<Integer>();
 	}
 
 	/**
@@ -25,10 +31,64 @@ public class AdvancedHeuristic implements Heuristic {
 	 * state.
 	 */
 	public int getValue(State state) {
+		this.visited.clear();
+		
+		if (state.isGoal()) {
+			return 0;
+		}
+		
+		return this.getMinimumRequiredMoves(state, 0);
 
-		// your code here
-		return 0;
-
+	}
+	
+	private int getMinimumRequiredMoves(State state, int v) {
+		if (visited.contains(v)) {
+			return 0;
+		}
+		
+		visited.add(v);
+		
+		int value = 1;
+		
+		int carPos = state.getVariablePosition(0);
+		int carPosFront = carPos + this.puzzle.getCarSize(v) - 1;
+		int carPosFixed = this.puzzle.getFixedPosition(v);
+		
+		for (int i = 0; i < this.numCars; i++) {
+			if (i == v) {
+				continue;
+			}
+			
+			if (this.puzzle.getCarOrient(i) == this.puzzle.getCarOrient(v)) {
+				continue;
+			}
+			
+			// for first car, ignore cars behind
+			if (v == 0 && this.puzzle.getFixedPosition(i) <= carPosFront) {
+			 	continue;
+			}
+			
+			int currentCarPos = state.getVariablePosition(i);
+			int currentCarPosFront = currentCarPos + this.puzzle.getCarSize(i);
+			
+			if (carPosFixed >= currentCarPos && carPosFixed < currentCarPosFront) {
+				
+				/**
+				 * i intersects with v
+				 * ===================
+				 * 
+				 * - check if v could move to make space for ???, or if i is really blocking
+				 * - if only one car is blocking, stop here, v could move (consider walls)
+				 * - if two cars are really blocking, calculate both routes and use the lower
+				 *   result for value
+				 */
+				
+				value += getMinimumRequiredMoves(state, i);
+			}
+			
+		}
+		
+		return value;
 	}
 
 }
