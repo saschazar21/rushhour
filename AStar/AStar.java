@@ -38,12 +38,11 @@ public class AStar {
     	while(!open.isEmpty()) {
     		
     		// Only performs sort if list was changed
-    		open.sort();				
+    		open.sort();
     		
     		HNode current = open.remove(0);
     		
     		if (current.getState().isGoal()) {
-    			// TODO: Check if correct: save solution path in path array
     			
     			// Set the path array size to depth of goal state;
     			// The +1 should be necessary to also include root node.
