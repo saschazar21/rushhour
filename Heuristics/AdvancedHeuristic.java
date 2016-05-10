@@ -63,14 +63,26 @@ public class AdvancedHeuristic implements Heuristic {
 				continue;
 			}
 			
-			if (this.puzzle.getFixedPosition(i) <= carPosFront) {
-				continue;
+			// for first car, ignore cars behind
+			if (v == 0 && this.puzzle.getFixedPosition(i) <= carPosFront) {
+			 	continue;
 			}
 			
 			int currentCarPos = state.getVariablePosition(i);
 			int currentCarPosFront = currentCarPos + this.puzzle.getCarSize(i);
 			
 			if (carPosFixed >= currentCarPos && carPosFixed < currentCarPosFront) {
+				
+				/**
+				 * i intersects with v
+				 * ===================
+				 * 
+				 * - check if v could move to make space for ???, or if i is really blocking
+				 * - if only one car is blocking, stop here, v could move (consider walls)
+				 * - if two cars are really blocking, calculate both routes and use the lower
+				 *   result for value
+				 */
+				
 				value += getMinimumRequiredMoves(state, i);
 			}
 			
