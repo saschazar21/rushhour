@@ -24,7 +24,7 @@ public class BlockingHeuristic implements Heuristic {
 		this.puzzle = puzzle;							// Store current puzzle
 		this.numCars = this.puzzle.getNumCars();        // Get the total number of cars
 		this.carPosFixed = puzzle.getFixedPosition(0);	// Get fixed position of our car.
-		this.carSize = this.puzzle.getCarSize(0);  // Get size of our car
+		this.carSize = this.puzzle.getCarSize(0);       // Get size of our car
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class BlockingHeuristic implements Heuristic {
 		int blocking = 1; 								// At least one car is still blocking our way.
 		
 		// Calculate the outermost position of our car,
-		int carPosFront = state.getVariablePosition(0) + this.carSize - 1;
+		int carPosFront = state.getVariablePosition(0) + this.carSize;
 		
 		for (int i = 1; i < this.numCars; i++) {
 			
@@ -48,7 +48,7 @@ public class BlockingHeuristic implements Heuristic {
 				continue;								// does not block our car.
 			}
 			
-			if (this.puzzle.getFixedPosition(i) <= carPosFront) {
+			if (this.puzzle.getFixedPosition(i) < carPosFront) {
 				continue;								// Car is behind of our car, does not block.
 			}
 			
