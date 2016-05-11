@@ -106,7 +106,7 @@ public class AdvancedHeuristic implements Heuristic {
 			 	continue;
 			}
 			
-			if (isIntersecting(vOrient, iOrient, vFixed, iFixed, iPos, iPosFront)) {
+			if (isIntersecting(v, i)) {
 				
 				// if the road could be cleared for previousV by moving v, i is not really blocking v
 				// for the car that has to escape, count any other car intersecting
@@ -114,7 +114,7 @@ public class AdvancedHeuristic implements Heuristic {
 					continue;
 				}
 				
-				if (isBehind(vOrient, iOrient, iFixed, iPos, iSize, vPos, vSize)) {
+				if (isBehind(v, i)) {
 					backPath.add(getMinimumRequiredMoves(state, i, v));
 				} else {
 					frontPath.add(getMinimumRequiredMoves(state, i, v));
@@ -127,7 +127,30 @@ public class AdvancedHeuristic implements Heuristic {
 			for (Integer val : frontPath) {
 				value += val;
 			}
-		} else {
+		} else if (previousV > -1) {
+			int prevFixed = this.puzzle.getFixedPosition(previousV);
+			boolean prevOrient = this.puzzle.getCarOrient(previousV);
+			
+			int needsSpace;
+			
+			if (frontPath.size() == 0 && prevOrient != vOrient) {
+				// check if wallt
+
+				needsSpace = Math.abs(prevFixed - vPosFront);
+				
+				if (vPosFront + needsSpace > puzzle.getGridSize()) {
+					frontPath.add(Integer.MAX_VALUE);
+				}
+			}
+			
+			if (backPath.size() == 0 && prevOrient != vOrient) {
+				// check if wall
+				needsSpace = Math.abs(prevFixed - vPos) + 1;
+				if (vPos - needsSpace < 0) {
+					backPath.add(Integer.MAX_VALUE);
+				}
+			}
+			
 			int front = 0;
 			for (Integer val : frontPath) {
 				front += val;
@@ -146,7 +169,19 @@ public class AdvancedHeuristic implements Heuristic {
 		return value;
 	}
 	
-	private boolean isIntersecting(boolean vOrient, boolean iOrient, int vFixed, int iFixed, int iPos, int iPosFront) {
+	private boolean isIntersecting(int v, int i) {
+		boolean vOrient = this.puzzle.getCarOrient(v);
+		int vSize = this.puzzle.getCarSize(v);
+		int vPos = state.getVariablePosition(v);
+		int vPosFront = vPos + vSize;
+		int vFixed = this.puzzle.getFixedPosition(v);
+		
+		boolean iOrient = this.puzzle.getCarOrient(i);
+		int iSize = this.puzzle.getCarSize(i);
+		int iPos = state.getVariablePosition(i);
+		int iPosFront = iPos + iSize;
+		int iFixed = this.puzzle.getFixedPosition(i);
+		
 		if (vOrient == iOrient) {
 			return vFixed == iFixed;
 		}
@@ -154,7 +189,19 @@ public class AdvancedHeuristic implements Heuristic {
 		return vFixed >= iPos && vFixed < iPosFront;
 	}
 	
-	private boolean isBehind(boolean vOrient, boolean iOrient, int iFixed, int iPos, int iSize, int vPos, int vSize) {
+	private boolean isBehind(int v, int i) {
+		boolean vOrient = this.puzzle.getCarOrient(v);
+		int vSize = this.puzzle.getCarSize(v);
+		int vPos = state.getVariablePosition(v);
+		int vPosFront = vPos + vSize;
+		int vFixed = this.puzzle.getFixedPosition(v);
+		
+		boolean iOrient = this.puzzle.getCarOrient(i);
+		int iSize = this.puzzle.getCarSize(i);
+		int iPos = state.getVariablePosition(i);
+		int iPosFront = iPos + iSize;
+		int iFixed = this.puzzle.getFixedPosition(i);
+		
 		if (vOrient == iOrient) {
 			return iPos + iSize < vPos;
 		}
@@ -164,8 +211,109 @@ public class AdvancedHeuristic implements Heuristic {
 	
 	// car2 is blocking car1
 	// check if car2 could move to clear the road for car1, or if car3 is blocking
-	private boolean isBlocking(int car1, int car2, int car3) {
-		return false;
+	private boolean isBlocking(int previousV, int v, int i) {
+		boolean prevOrient = this.puzzle.getCarOrient(previousV);
+		int prevSize = this.puzzle.getCarSize(previousV);
+		int prevPos = state.getVariablePosition(previousV);
+		int prevPosFront = prevPos + prevSize;
+		int prevFixed = this.puzzle.getFixedPosition(previousV);
+		
+		boolean vOrient = this.puzzle.getCarOrient(v);
+		int vSize = this.puzzle.getCarSize(v);
+		int vPos = state.getVariablePosition(v);
+		int vPosFront = vPos + vSize;
+		int vFixed = this.puzzle.getFixedPosition(v);
+		
+		boolean iOrient = this.puzzle.getCarOrient(i);
+		int iSize = this.puzzle.getCarSize(i);
+		int iPos = state.getVariablePosition(i);
+		int iPosFront = iPos + iSize;
+		int iFixed = this.puzzle.getFixedPosition(i);
+		
+		
+		int hasSpace = hasSpace(v, i);
+		
+		int needsSpace = needsSpace(previousV, v, i);
+		
+		if (needsSpace < 0) {
+			return true;
+		}
+		
+		return hasSpace < needsSpace;
+	}
+	
+	private int hasSpace(int v, int i) {
+		boolean vOrient = this.puzzle.getCarOrient(v);
+		int vSize = this.puzzle.getCarSize(v);
+		int vPos = state.getVariablePosition(v);
+		int vPosFront = vPos + vSize;
+		int vFixed = this.puzzle.getFixedPosition(v);
+		
+		boolean iOrient = this.puzzle.getCarOrient(i);
+		int iSize = this.puzzle.getCarSize(i);
+		int iPos = state.getVariablePosition(i);
+		int iPosFront = iPos + iSize;
+		int iFixed = this.puzzle.getFixedPosition(i);
+		
+		int hasSpace;
+		
+		if (vOrient != iOrient) {
+			
+			if (isBehind(v, i)) {
+				hasSpace = Math.abs(vPos - iFixed);
+			} else {
+				hasSpace = Math.abs(vPosFront - iFixed);
+			}
+			
+		} else {
+			
+			if (isBehind(v, i)) {
+				hasSpace = Math.abs(vPos - iPosFront);
+			} else {
+				hasSpace = Math.abs(vPosFront - iPos);
+			}
+			
+		}
+		
+		return hasSpace;
+	}
+	
+	private int needsSpace(int previousV, int v, int i) {
+		boolean prevOrient = this.puzzle.getCarOrient(previousV);
+		int prevSize = this.puzzle.getCarSize(previousV);
+		int prevPos = state.getVariablePosition(previousV);
+		int prevPosFront = prevPos + prevSize;
+		int prevFixed = this.puzzle.getFixedPosition(previousV);
+		
+		boolean vOrient = this.puzzle.getCarOrient(v);
+		int vSize = this.puzzle.getCarSize(v);
+		int vPos = state.getVariablePosition(v);
+		int vPosFront = vPos + vSize;
+		int vFixed = this.puzzle.getFixedPosition(v);
+		
+		boolean iOrient = this.puzzle.getCarOrient(i);
+		int iSize = this.puzzle.getCarSize(i);
+		int iPos = state.getVariablePosition(i);
+		int iPosFront = iPos + iSize;
+		int iFixed = this.puzzle.getFixedPosition(i);
+		
+		int needsSpace;
+		
+		if (prevOrient != vOrient) {
+			
+			if (isBehind(v, i)) {
+				needsSpace = Math.abs(prevFixed - vPos) + 1;
+			} else {
+				needsSpace = Math.abs(prevFixed - vPosFront);
+			}
+			
+		} else {
+			
+			// do stuff
+			return -1;
+		}
+		
+		return needsSpace;
 	}
 
 }
