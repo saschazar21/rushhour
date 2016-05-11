@@ -2,6 +2,7 @@ package Heuristics;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import AStar.Puzzle;
 import AStar.State;
@@ -61,15 +62,34 @@ public class AdvancedHeuristic implements Heuristic {
 		
 		int value = 1;
 		
-		// int carPos = state.getVariablePosition(v);
-		// int carPosFront = carPos + this.puzzle.getCarSize(v) - 1;
-		// int carPosFixed = this.puzzle.getFixedPosition(v);
+		if (previousV > -1) {
+			boolean prevOrient = this.puzzle.getCarOrient(previousV);
+			int prevSize = this.puzzle.getCarSize(previousV);
+			int prevPos = state.getVariablePosition(previousV);
+			int prevPosFront = prevPos + prevSize;
+			int prevFixed = this.puzzle.getFixedPosition(previousV);
+		}
 		
-		// Memorize calculated values
-		ArrayList<Integer> values = new ArrayList<Integer>();
+		boolean vOrient = this.puzzle.getCarOrient(v);
+		int vSize = this.puzzle.getCarSize(v);
+		int vPos = state.getVariablePosition(v);
+		int vPosFront = vPos + vSize;
+		int vFixed = this.puzzle.getFixedPosition(v);
+		
+		
+		// Memorize calculated values		
+		ArrayList<Integer> frontPath = new ArrayList<Integer>();
+		ArrayList<Integer> backPath = new ArrayList<Integer>();
+		
 		// boolean carCouldMove = false;
 		
 		for (int i = 0; i < this.numCars; i++) {
+			
+			boolean iOrient = this.puzzle.getCarOrient(i);
+			int iSize = this.puzzle.getCarSize(i);
+			int iPos = state.getVariablePosition(i);
+			int iPosFront = iPos + iSize;
+			int iFixed = this.puzzle.getFixedPosition(i);
 			
 			// do not process the current v
 			if (i == v) {
@@ -77,21 +97,16 @@ public class AdvancedHeuristic implements Heuristic {
 			}
 			
 			// with a depth > 0 cars with same orientation could be next to each other => do not continue
-			if (v== 0 && this.puzzle.getCarOrient(i) == this.puzzle.getCarOrient(v)) {
+			if (v== 0 && iOrient == vOrient) {
 				continue;
 			}
 			
 			// for the car that has to escape, ignore cars behind
-			if (v == 0 && this.puzzle.getFixedPosition(i) <= state.getVariablePosition(v) + this.puzzle.getCarSize(v) - 1) {
+			if (v == 0 && iFixed < vPos + vSize) {
 			 	continue;
 			}
 			
-			// int currentCarPos = state.getVariablePosition(i);
-			// int currentCarPosFront = currentCarPos + this.puzzle.getCarSize(i);
-			
-			// if (carPosFixed >= currentCarPos && carPosFixed < currentCarPosFront) {
-			
-			if (isIntersecting(v, i)) {
+			if (isIntersecting(vOrient, iOrient, vFixed, iFixed, iPos, iPosFront)) {
 				
 				// if the road could be cleared for previousV by moving v, i is not really blocking v
 				// for the car that has to escape, count any other car intersecting
@@ -99,78 +114,58 @@ public class AdvancedHeuristic implements Heuristic {
 					continue;
 				}
 				
-				/**
-				 * i intersects with v
-				 * ===================
-				 * 
-				 * - check if v could move to make space for ??? (previous v), or if i is really blocking
-				 * -               (only check i's right next to v) ??? No?!
-				 * - if only one car is blocking and no wall is blocking, stop here, v could move
-				 * - if two cars are really blocking, calculate both routes and use the lower result for value
-				 */
-				
-				// only do this checks if we have a previousV
-				if (v != 0 && previousV > -1) {
-					// check if v could move as far - although i is intersecting - to allow previousV to move
+				if (isBehind(vOrient, iOrient, iFixed, iPos, iSize, vPos, vSize)) {
+					backPath.add(getMinimumRequiredMoves(state, i, v));
+				} else {
+					frontPath.add(getMinimumRequiredMoves(state, i, v));
 				}
-				
-				values.add(getMinimumRequiredMoves(state, i, v));
 			}
 			// 
 		}
 		
 		if (v == 0) {
-			for (Integer val : values) {
+			for (Integer val : frontPath) {
 				value += val;
 			}
-			values.clear();
+		} else {
+			int front = 0;
+			for (Integer val : frontPath) {
+				front += val;
+			}
+			
+			int back = 0;
+			for (Integer val : backPath) {
+				back += val;
+			}
+			
+			if (front != 0 && back != 0) {
+				value += Math.min(front, back);
+			}
 		}
 		
-		return values.isEmpty() ? value : Collections.min(values) + value;
+		return value;
 	}
 	
-	private boolean isIntersecting(int car1, int car2) {
-		// int car1Pos = state.getVariablePosition(car1);
-		// int car1PosFront = car1Pos + this.puzzle.getCarSize(car1);
-		int car1PosFixed = this.puzzle.getFixedPosition(car1);
-		
-		int car2Pos = state.getVariablePosition(car2);
-		int car2PosFront = car2Pos + this.puzzle.getCarSize(car2);
-		
-		if (car1PosFixed >= car2Pos && car1PosFixed < car2PosFront) {
-			return true;
+	private boolean isIntersecting(boolean vOrient, boolean iOrient, int vFixed, int iFixed, int iPos, int iPosFront) {
+		if (vOrient == iOrient) {
+			return vFixed == iFixed;
 		}
 		
-		return false;
+		return vFixed >= iPos && vFixed < iPosFront;
+	}
+	
+	private boolean isBehind(boolean vOrient, boolean iOrient, int iFixed, int iPos, int iSize, int vPos, int vSize) {
+		if (vOrient == iOrient) {
+			return iPos + iSize < vPos;
+		}
+		
+		return iFixed < vPos + vSize;
 	}
 	
 	// car2 is blocking car1
 	// check if car2 could move to clear the road for car1, or if car3 is blocking
 	private boolean isBlocking(int car1, int car2, int car3) {
-		
-		int car1Pos = state.getVariablePosition(car1);
-		int car1PosFront = car1Pos + this.puzzle.getCarSize(car1);
-		int car1PosFixed = this.puzzle.getFixedPosition(car1);
-		boolean car1Orient = puzzle.getCarOrient(car1);
-		
-		int car2Pos = state.getVariablePosition(car2);
-		int car2PosFront = car2Pos + this.puzzle.getCarSize(car2);
-		int car2PosFixed = this.puzzle.getFixedPosition(car2);
-		boolean car2Orient = puzzle.getCarOrient(car2);
-		
-		int car3Pos = state.getVariablePosition(car3);
-		int car3PosFront = car2Pos + this.puzzle.getCarSize(car3);
-		int car3PosFixed = this.puzzle.getFixedPosition(car3);
-		boolean car3Orient = puzzle.getCarOrient(car3);
-		
-		// ???
-		if (car1Orient == car2Orient) {
-			return true;
-		}
-		
-		
-		
-		return true;
+		return false;
 	}
 
 }
