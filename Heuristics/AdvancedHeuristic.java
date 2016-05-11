@@ -133,21 +133,28 @@ public class AdvancedHeuristic implements Heuristic {
 			
 			int needsSpace;
 			
-			if (frontPath.size() == 0 && prevOrient != vOrient) {
-				// check if wallt
-
-				needsSpace = Math.abs(prevFixed - vPosFront);
-				
-				if (vPosFront + needsSpace > puzzle.getGridSize()) {
-					frontPath.add(Integer.MAX_VALUE);
+			if (frontPath.size() == 0) {
+				// check if wall
+				if (prevOrient != vOrient) {
+					needsSpace = Math.abs(prevFixed - vPosFront);
+					
+					if (vPosFront + needsSpace > puzzle.getGridSize()) {
+						frontPath.add(Integer.MAX_VALUE);
+					}
+				} else {
+					// frontPath.add(Integer.MAX_VALUE);
 				}
 			}
 			
-			if (backPath.size() == 0 && prevOrient != vOrient) {
+			if (backPath.size() == 0) {
 				// check if wall
-				needsSpace = Math.abs(prevFixed - vPos) + 1;
-				if (vPos - needsSpace < 0) {
-					backPath.add(Integer.MAX_VALUE);
+				if (prevOrient != vOrient) {
+					needsSpace = Math.abs(prevFixed - vPos) + 1;
+					if (vPos - needsSpace < 0) {
+						backPath.add(Integer.MAX_VALUE);
+					}
+				} else {
+					// backPath.add(Integer.MAX_VALUE);
 				}
 			}
 			
@@ -203,7 +210,7 @@ public class AdvancedHeuristic implements Heuristic {
 		int iFixed = this.puzzle.getFixedPosition(i);
 		
 		if (vOrient == iOrient) {
-			return iPos + iSize < vPos;
+			return iPos + iSize <= vPos;
 		}
 		
 		return iFixed < vPos + vSize;
@@ -236,7 +243,7 @@ public class AdvancedHeuristic implements Heuristic {
 		int needsSpace = needsSpace(previousV, v, i);
 		
 		if (needsSpace < 0) {
-			return true;
+			return false;
 		}
 		
 		return hasSpace < needsSpace;

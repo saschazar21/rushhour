@@ -15,7 +15,15 @@ public class HNode extends Node implements Comparable<HNode> {
 	 */
 	@Override
 	public int compareTo(HNode other) {
-		return this.f - other.f;
+		if (this.f == other.f) {
+			return 0;
+		}
+		
+		if (this.f > other.f) {
+			return 1;
+		}
+		
+		return -1;
 	}
 
 	@Override
