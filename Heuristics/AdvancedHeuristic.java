@@ -119,6 +119,12 @@ public class AdvancedHeuristic implements Heuristic {
 			// 
 		}
 		
+		if (v == 0) {
+			for (Integer val : values) {
+				value += val;
+			}
+			values.clear();
+		}
 		
 		return values.isEmpty() ? value : Collections.min(values) + value;
 	}
