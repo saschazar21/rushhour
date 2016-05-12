@@ -32,18 +32,18 @@ public class HNode extends Node implements Comparable<HNode> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (obj == null) {
+	public boolean equals(Object other) {
+		if (other == null) {
 			return false;
 		}
 		
-		if (this == obj) {
+		if (this == other) {
 			return true;
 		}
 		
 		
-		if (obj instanceof Node || obj instanceof HNode) {
-			return ((Node) obj).getState().equals(this.getState());
+		if (other instanceof Node || other instanceof HNode) {
+			return ((Node) other).getState().equals(this.getState());
 		}
 		
 		return false;

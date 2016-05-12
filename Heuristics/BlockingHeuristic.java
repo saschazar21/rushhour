@@ -32,6 +32,7 @@ public class BlockingHeuristic implements Heuristic {
 	 * state.
 	 */
 	public int getValue(State state) {
+		
 		// Return 0, if state equals goal state (No further heuristics needed)
 		if (state.isGoal()) {
 			return 0;

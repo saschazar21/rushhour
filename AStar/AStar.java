@@ -69,22 +69,27 @@ public class AStar {
     			h = heuristic.getValue(successor.getState());
     			HNode hSuccessor = new HNode(successor, h);
     			
-    			if (shouldSkip(hSuccessor)) {
-    				continue;
+    			if (open.contains(hSuccessor)) {
+    				keepBetterNodeOnOpenList(hSuccessor);
+    			} else if (!closed.contains(hSuccessor)) {
+    				open.add(hSuccessor);
     			}
-    			
-    			// Add the successor of current node to open list,
-    			// Set path costs and heuristics accordingly
-    			open.add(hSuccessor);
     		}
 
     	}
 
     }
     
-    private boolean shouldSkip(HNode successor) {
-    	// TODO: http://web.mit.edu/eranki/www/tutorials/search/
-    	return closed.contains(successor) || open.contains(successor);
+    // Idea from: http://web.mit.edu/eranki/www/tutorials/search/
+    private void keepBetterNodeOnOpenList(HNode successor) {
+    	HNode existing = open.get(successor);
+    	
+    	if (existing != null) {
+    		if (existing.compareTo(successor) > 0) {
+    			open.remove(existing);
+    			open.add(successor);
+    		}
+    	}
     }
 
 }

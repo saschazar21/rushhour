@@ -267,7 +267,11 @@ public class AdvancedHeuristic implements Heuristic {
 		if (vOrient != iOrient) {
 			
 			if (isBehind(v, i)) {
-				hasSpace = Math.abs(vPos - iFixed);
+				/*
+				* hasSpace = Math.abs(vPos - iFixed);
+				* Think we have to add +1 here (fixed positioned car has width of 1)
+				*/
+				hasSpace = Math.abs(vPos - iFixed) + 1;
 			} else {
 				hasSpace = Math.abs(vPosFront - iFixed);
 			}

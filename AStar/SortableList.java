@@ -14,6 +14,25 @@ public class SortableList<T extends Comparable> {
 		this.list.add(element);
 	}
 	
+	
+	public int indexOf(T element) {
+		return this.list.indexOf(element);
+	}
+	
+	public T get(int index) {
+		return this.list.get(index);
+	}
+	
+	public T get(T element) {
+		int index = this.list.indexOf(element);
+		
+		if (index == -1) {
+			return null;
+		}
+		
+		return this.list.get(index);
+	}
+	
 	public T remove(int index) {
 		T removed = this.list.remove(index);
 		
