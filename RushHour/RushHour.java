@@ -41,6 +41,8 @@ public class RushHour {
     
 	Puzzle[] puzzles = Puzzle.readPuzzlesFromFile(filename);
 
+		boolean showTime = false;
+	
 		String[] heuristic_names = null;
 		int num_puzzles = puzzles.length; // puzzles.length;
 		int num_heuristics = 0;
@@ -110,17 +112,29 @@ public class RushHour {
 
 		System.out.print("          ");
 		for (int h = 0; h < num_heuristics; h++)
-			System.out.print(" |    " + right_pad(heuristic_names[h], 24));
+			if (showTime) {
+				System.out.print(" |    " + right_pad(heuristic_names[h], 24));
+			} else {
+				System.out.print(" |    " + right_pad(heuristic_names[h], 18));
+			}
 		System.out.println();
 
 		System.out.print("name      ");
 		for (int h = 0; h < num_heuristics; h++)
-			System.out.print(" |    nodes dpth  br.fac  dur.");
+			if (showTime) {
+				System.out.print(" |    nodes dpth  br.fac  dur.");
+			} else {
+				System.out.print(" |    nodes dpth  br.fac");
+			}
 		System.out.println();
 
 		System.out.print("----------");
 		for (int h = 0; h < num_heuristics; h++)
-			System.out.print("-+----------------------------");
+			if (showTime) {
+				System.out.print("-+----------------------------");
+			} else {
+				System.out.print("-+----------------------");
+			}
 		System.out.println();
 
 		NumberFormat brfac_nf = new DecimalFormat("##0.000");
@@ -135,7 +149,7 @@ public class RushHour {
 					System.out.print(" | " + left_pad(Integer.toString(num_expanded[i][h]), 8) + " "
 							+ left_pad(Integer.toString(soln_depth[i][h]), 4) + " " + left_pad(
 									brfac_nf.format(BranchingFactor.compute(num_expanded[i][h], soln_depth[i][h])), 7)
-							+ left_pad(Long.toString(duration[i][h]), 6)
+							+ (showTime ? left_pad(Long.toString(duration[i][h]), 6) : "")
 							);
 				}
 			}
