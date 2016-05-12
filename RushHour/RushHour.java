@@ -41,12 +41,15 @@ public class RushHour {
     
 	Puzzle[] puzzles = Puzzle.readPuzzlesFromFile(filename);
 
+		boolean showTime = false;
+	
 		String[] heuristic_names = null;
-		int num_puzzles = puzzles.length;
+		int num_puzzles = puzzles.length; // puzzles.length;
 		int num_heuristics = 0;
 
 		int[][] num_expanded = null;
 		int[][] soln_depth = null;
+		long[][] duration = null;
 
 		// run each heuristic on each puzzle
 		for (int i = 0; i < num_puzzles; i++) {
@@ -54,13 +57,16 @@ public class RushHour {
 			System.out.println("puzzle = " + puzzles[i].getName());
 
 			Heuristic[] heuristics = { // these are the heuristics to be used
-					new ZeroHeuristic(puzzles[i]), new BlockingHeuristic(puzzles[i]),
-					new AdvancedHeuristic(puzzles[i]), };
+					new ZeroHeuristic(puzzles[i]),
+					new BlockingHeuristic(puzzles[i]),
+					new AdvancedHeuristic(puzzles[i])
+				};
 
 			if (i == 0) {
 				num_heuristics = heuristics.length;
 				num_expanded = new int[num_puzzles][num_heuristics];
 				soln_depth = new int[num_puzzles][num_heuristics];
+				duration = new long[num_puzzles][num_heuristics];
 
 				heuristic_names = new String[num_heuristics];
 				for (int h = 0; h < num_heuristics; h++)
@@ -74,7 +80,10 @@ public class RushHour {
 				System.out.println("heuristic = " + heuristic_names[h]);
 
 				puzzles[i].resetSearchCount();
+				
+				long startTime = System.currentTimeMillis();
 				AStar search = new AStar(puzzles[i], heuristics[h]);
+				long endTime   = System.currentTimeMillis();
 
 				if (search.path == null) {
 					System.out.println("NO SOLUTION FOUND.");
@@ -88,8 +97,9 @@ public class RushHour {
 
 					num_expanded[i][h] = puzzles[i].getSearchCount();
 					soln_depth[i][h] = search.path.length - 1;
+					duration[i][h] = endTime - startTime;
 
-					System.out.println("nodes expanded: " + num_expanded[i][h] + ", soln depth: " + soln_depth[i][h]);
+					System.out.println("nodes expanded: " + num_expanded[i][h] + ", soln depth: " + soln_depth[i][h] + ", duration: " + duration[i][h]);
 
 				}
 			}
@@ -102,17 +112,29 @@ public class RushHour {
 
 		System.out.print("          ");
 		for (int h = 0; h < num_heuristics; h++)
-			System.out.print(" |    " + right_pad(heuristic_names[h], 18));
+			if (showTime) {
+				System.out.print(" |    " + right_pad(heuristic_names[h], 24));
+			} else {
+				System.out.print(" |    " + right_pad(heuristic_names[h], 18));
+			}
 		System.out.println();
 
 		System.out.print("name      ");
 		for (int h = 0; h < num_heuristics; h++)
-			System.out.print(" |    nodes dpth  br.fac");
+			if (showTime) {
+				System.out.print(" |    nodes dpth  br.fac  dur.");
+			} else {
+				System.out.print(" |    nodes dpth  br.fac");
+			}
 		System.out.println();
 
 		System.out.print("----------");
 		for (int h = 0; h < num_heuristics; h++)
-			System.out.print("-+----------------------");
+			if (showTime) {
+				System.out.print("-+----------------------------");
+			} else {
+				System.out.print("-+----------------------");
+			}
 		System.out.println();
 
 		NumberFormat brfac_nf = new DecimalFormat("##0.000");
@@ -126,7 +148,9 @@ public class RushHour {
 				} else {
 					System.out.print(" | " + left_pad(Integer.toString(num_expanded[i][h]), 8) + " "
 							+ left_pad(Integer.toString(soln_depth[i][h]), 4) + " " + left_pad(
-									brfac_nf.format(BranchingFactor.compute(num_expanded[i][h], soln_depth[i][h])), 7));
+									brfac_nf.format(BranchingFactor.compute(num_expanded[i][h], soln_depth[i][h])), 7)
+							+ (showTime ? left_pad(Long.toString(duration[i][h]), 6) : "")
+							);
 				}
 			}
 			System.out.println();
