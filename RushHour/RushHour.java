@@ -7,6 +7,7 @@ import AStar.AStar;
 import AStar.BranchingFactor;
 import AStar.Puzzle;
 import Heuristics.AdvancedHeuristic;
+import Heuristics.AdvancedHeuristic3;
 import Heuristics.BlockingHeuristic;
 import Heuristics.Heuristic;
 import Heuristics.TestHeuristic;
@@ -58,7 +59,8 @@ public class RushHour {
 			Heuristic[] heuristics = { // these are the heuristics to be used
 					new ZeroHeuristic(puzzles[i]),
 					new BlockingHeuristic(puzzles[i]),
-					new AdvancedHeuristic(puzzles[i]),
+					// new AdvancedHeuristic(puzzles[i]),
+					new AdvancedHeuristic3(puzzles[i])
 					// new TestHeuristic(puzzles[i])
 				};
 

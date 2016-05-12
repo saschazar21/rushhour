@@ -50,10 +50,10 @@ public class AdvancedHeuristic implements Heuristic {
 	}
 	
 	private int getMinimumRequiredMoves(State state, int v) {
-		return this.getMinimumRequiredMoves(state, v, -1);
+		return this.getMinimumRequiredMoves(state, v, -1, -1);
 	}
 	
-	private int getMinimumRequiredMoves(State state, int v, int previousV) {
+	private int getMinimumRequiredMoves(State state, int v, int previousV, int needsToMove) {
 		if (visited.contains(v)) {
 			return 0;
 		}
@@ -110,14 +110,51 @@ public class AdvancedHeuristic implements Heuristic {
 				
 				// if the road could be cleared for previousV by moving v, i is not really blocking v
 				// for the car that has to escape, count any other car intersecting
-				if (v != 0 && previousV > -1 && !isBlocking(previousV, v, i)) {
-					continue;
+				
+				int needsToMoveNew = needsToMove;
+				if (v != 0 && previousV > -1) {
+					boolean prevOrient = this.puzzle.getCarOrient(previousV);
+					int prevSize = this.puzzle.getCarSize(previousV);
+					int prevPos = state.getVariablePosition(previousV);
+					int prevPosFront = prevPos + prevSize;
+					int prevFixed = this.puzzle.getFixedPosition(previousV);
+					
+					
+					int hasSpace = hasSpace(v, i);
+					int needsSpace;
+					
+					if (prevOrient == vOrient) {
+						needsSpace = needsToMove - hasSpace;
+						needsToMoveNew = needsSpace;
+						
+						
+					} else {
+						needsSpace = needsSpace(previousV, v, i);
+						needsToMoveNew = needsSpace;
+					}
+					
+					if (needsToMoveNew <= 0) {
+						continue;
+					}
+					
 				}
 				
 				if (isBehind(v, i)) {
-					backPath.add(getMinimumRequiredMoves(state, i, v));
+					if (vPos - needsToMoveNew  < 0) {
+						backPath.clear();
+						backPath.add(Integer.MAX_VALUE);
+						continue;
+					}
+					
+					backPath.add(getMinimumRequiredMoves(state, i, v, needsToMoveNew));
 				} else {
-					frontPath.add(getMinimumRequiredMoves(state, i, v));
+					if (vPosFront + needsToMoveNew  > puzzle.getGridSize()) {
+						frontPath.clear();
+						frontPath.add(Integer.MAX_VALUE);
+						continue;
+					}
+					
+					frontPath.add(getMinimumRequiredMoves(state, i, v, needsToMoveNew));
 				}
 			}
 			// 
@@ -312,6 +349,7 @@ public class AdvancedHeuristic implements Heuristic {
 		
 		if (prevOrient != vOrient) {
 			
+			// vertauscht
 			if (isBehind(v, i)) {
 				needsSpace = Math.abs(prevFixed - vPos) + 1;
 			} else {
