@@ -65,27 +65,27 @@ public class AdvancedHeuristic3 implements Heuristic {
 	private ArrayList<Integer> getInitialBlockingCars() {		
 		ArrayList<Integer> blocking = new ArrayList<Integer>();
 		
-		boolean orientation = puzzle.getCarOrient(0);
-		int size = puzzle.getCarSize(0);
-		int pos = state.getVariablePosition(0);
-		int posFixed = puzzle.getFixedPosition(0);
+		boolean carOrient = puzzle.getCarOrient(0);
+		int carSize = puzzle.getCarSize(0);
+		int carPos = state.getVariablePosition(0);
+		int carFixed = puzzle.getFixedPosition(0);
 		
 		for (int i = 1; i < this.numCars; i++) {
 			
-			if (orientation == puzzle.getCarOrient(i)) {
+			if (carOrient == puzzle.getCarOrient(i)) {
 				continue;
 			}
 			
 			int iFixed = puzzle.getFixedPosition(i);
 			
-			if (iFixed < pos + size) {
+			if (iFixed < carPos + carSize) {
 			 	continue;
 			}
 			
 			int iPos = state.getVariablePosition(i);
 			int iPosFront = iPos + puzzle.getCarSize(i);
 			
-			if (posFixed >= iPos && posFixed < iPosFront) {
+			if (carFixed >= iPos && carFixed < iPosFront) {
 				blocking.add(i);
 			}
 			
@@ -95,15 +95,19 @@ public class AdvancedHeuristic3 implements Heuristic {
 	}
 	
 	private int getBlockingValue(int car, int needsSpaceFront, int needsSpaceBack) {
-		if (visited.contains(car)) {
-			return 0;
-		}
-		
 		visited.add(car);
 		
-		int value = 1;
+		int value = 0;
 		
-		for (int next = 1; next < numCars; next++) {
+		for (int next = 0; next < numCars; next++) {
+			
+			if (next == car) {
+				continue;
+			}
+			
+			if (visited.contains(next)) {
+				continue;
+			}
 			
 			if (!isIntersecting(car, next)) {
 				continue;
@@ -133,7 +137,7 @@ public class AdvancedHeuristic3 implements Heuristic {
 			
 		}
 		
-		return value;
+		return value + 1;
 	}
 	
 	private boolean canMove(int car, int next, int needsSpace, boolean direction) {
