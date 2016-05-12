@@ -52,8 +52,8 @@ public class AdvancedHeuristic3 implements Heuristic {
 		
 		for (Integer car : getInitialBlockingCars()) {
 			
-			int needsSpaceFront = needsSpaceFwd(0, car, 0);
-			int needsSpaceBack = needsSpaceBwd(0, car, 0);
+			int needsSpaceFront = needsSpace(0, car, 0, true);
+			int needsSpaceBack = needsSpace(0, car, 0, false);
 			
 			value += getBlockingValue(car, needsSpaceFront, needsSpaceBack);
 			
@@ -67,7 +67,7 @@ public class AdvancedHeuristic3 implements Heuristic {
 		ArrayList<Integer> blocking = new ArrayList<Integer>();
 		
 		boolean orientation = puzzle.getCarOrient(0);
-		int size =puzzle.getCarSize(0);
+		int size = puzzle.getCarSize(0);
 		int pos = state.getVariablePosition(0);
 		int posFixed = puzzle.getFixedPosition(0);
 		
@@ -112,21 +112,21 @@ public class AdvancedHeuristic3 implements Heuristic {
 			
 			int valueFwd = 0, valueBwd = 0;
 			
-			boolean fwdMoveable = canMoveFwd(car, next, needsSpaceFront);
-			boolean bwdMoveable = canMoveBwd(car, next, needsSpaceBack);
+			boolean fwdMoveable = canMove(car, next, needsSpaceFront, true);
+			boolean bwdMoveable = canMove(car, next, needsSpaceBack, false);
 			
-			int needsSpaceFwd = needsSpaceFwd(car, next, needsSpaceFront);
-			int needsSpaceBwd = needsSpaceBwd(car, next, needsSpaceBack);
+			int needsSpaceFwd = needsSpace(car, next, needsSpaceFront, true);
+			int needsSpaceBwd = needsSpace(car, next, needsSpaceBack, false);
 			
 			if (!fwdMoveable) {
 				valueFwd = getBlockingValue(next, needsSpaceFwd, needsSpaceBwd);
-			} else if (isWallAhead(car, needsSpaceFront)) {
+			} else if (isWallBlocking(car, needsSpaceFront, true)) {
 				valueFwd = Integer.MAX_VALUE;
 			}
 			
 			if (!bwdMoveable) {
 				valueBwd = getBlockingValue(next, needsSpaceFwd, needsSpaceBwd);
-			} else if (isWallBehind(car, needsSpaceBack)) {
+			} else if (isWallBlocking(car, needsSpaceBack, false)) {
 				valueBwd = Integer.MAX_VALUE;
 			}
 			
@@ -137,144 +137,101 @@ public class AdvancedHeuristic3 implements Heuristic {
 		return value;
 	}
 	
-	private boolean canMoveFwd(int car, int next, int needsSpaceFwd) {
-		if (isBehind(car, next)) {
+	private boolean canMove(int car, int next, int needsSpace, boolean direction) {
+		boolean isBehind = isBehind(car, next);
+		
+		if (isBehind && direction || !isBehind && !direction) {
 			return true;
 		}
 		
-		int hasSpace = hasSpaceFwd(car, next);
-		return hasSpace >= needsSpaceFwd;
+		int hasSpace = hasSpace(car, next, direction);
+		return hasSpace >= needsSpace;
 	}
 	
-	private int needsSpaceFwd(int car, int next, int needsSpaceFwdOld) {
+	private int needsSpace(int car, int next, int needsSpace, boolean direction) {
 		if (puzzle.getCarOrient(car) == puzzle.getCarOrient(next)) {
-			int hasSpace = hasSpaceFwd(car, next);
-			return needsSpaceFwdOld - hasSpace;
+			int hasSpace = hasSpace(car, next, direction);
+			return needsSpace - hasSpace;
 		}
 		
 		int carFixed = puzzle.getFixedPosition(car);
 		int nextPos = state.getVariablePosition(next);
-		int nextFront = nextPos + puzzle.getCarSize(next);
 		
-		return Math.abs(carFixed - nextPos) + 1;
+		if (direction) {
+			return Math.abs(carFixed - nextPos) + 1;
+		}
+		
+		int nextPosFront = nextPos + puzzle.getCarSize(next);
+		
+		return Math.abs(carFixed - nextPosFront);
 	}
 	
-	private int hasSpaceFwd(int car, int next) {
-		
-		// int carFixed = puzzle.getFixedPosition(car);
+	private int hasSpace(int car, int next, boolean direction) {
 		int carPos = state.getVariablePosition(car);
 		int carPosFront = carPos + puzzle.getCarSize(car);
-		
-		int nextPos = state.getVariablePosition(next);
-		// int nextFront = nextPos + puzzle.getCarSize(next);
 		int nextFixed = puzzle.getFixedPosition(next);
 		
 		if (puzzle.getCarOrient(car) != puzzle.getCarOrient(next)) {
-			return Math.abs(carPosFront - nextFixed);
-		}
-		
-		return Math.abs(carPosFront - nextPos);
-	}
-	
-	private boolean isWallAhead(int car, int needsSpaceFwd) {
-		int carPos = state.getVariablePosition(car);
-		int carPosFront = carPos + puzzle.getCarSize(car);
-		
-		if (carPosFront + needsSpaceFwd > puzzle.getGridSize()) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private boolean canMoveBwd(int car, int next, int needsSpaceBwd) {
-		if (!isBehind(car, next)) {
-			return true;
-		}
-		
-		int hasSpace = hasSpaceBwd(car, next);
-		return hasSpace >= needsSpaceBwd;
-	}
-	
-	private int needsSpaceBwd(int car, int next, int needsSpaceBwdOld) {
-		if (puzzle.getCarOrient(car) == puzzle.getCarOrient(next)) {
-			int hasSpace = hasSpaceBwd(car, next);
-			return needsSpaceBwdOld - hasSpace;
-		}
-		
-		int carFixed = puzzle.getFixedPosition(car);
-		int nextPos = state.getVariablePosition(next);
-		int nextFront = nextPos + puzzle.getCarSize(next);
-		
-		return Math.abs(carFixed - nextFront);
-	}
-	
-	private int hasSpaceBwd(int car, int next) {
-		
-		int carFixed = puzzle.getFixedPosition(car);
-		int carPos = state.getVariablePosition(car);
-		int carPosFront = carPos + puzzle.getCarSize(car);
-		
-		int nextPos = state.getVariablePosition(next);
-		int nextFront = nextPos + puzzle.getCarSize(next);
-		int nextFixed = puzzle.getFixedPosition(next);
-		
-		if (puzzle.getCarOrient(car) != puzzle.getCarOrient(next)) {
+			if (direction) {
+				return Math.abs(carPosFront - nextFixed);
+			}
+			
 			return Math.abs(carPos - nextFixed) + 1;
 		}
 		
-		return Math.abs(carPos - nextFront);
+		int nextPos = state.getVariablePosition(next);
+		
+		if (direction) {
+			return Math.abs(carPosFront - nextPos);
+		}
+		
+		int nextPosFront = nextPos + puzzle.getCarSize(next);
+		
+		return Math.abs(carPos - nextPosFront);
 	}
 	
-	private boolean isWallBehind(int car, int needsSpaceBwd) {
+	private boolean isWallBlocking(int car, int needsSpace, boolean direction) {
 		int carPos = state.getVariablePosition(car);
-		// int carPosFront = carPos + puzzle.getCarSize(car);
+		int carPosFront = carPos + puzzle.getCarSize(car);
 		
-		if (carPos - needsSpaceBwd < 0) {
+		if (direction && (carPosFront + needsSpace > puzzle.getGridSize())) {
+			return true;
+		}
+		
+		if (!direction && (carPos - needsSpace < 0)) {
 			return true;
 		}
 		
 		return false;
 	}
 	
-	private boolean isIntersecting(int v, int i) {
-		boolean vOrient = this.puzzle.getCarOrient(v);
-		int vSize = this.puzzle.getCarSize(v);
-		int vPos = state.getVariablePosition(v);
-		int vPosFront = vPos + vSize;
-		int vFixed = this.puzzle.getFixedPosition(v);
+	private boolean isIntersecting(int car, int next) {
+		int carFixed = puzzle.getFixedPosition(car);
+		int nextFixed = puzzle.getFixedPosition(next);
 		
-		boolean iOrient = this.puzzle.getCarOrient(i);
-		int iSize = this.puzzle.getCarSize(i);
-		int iPos = state.getVariablePosition(i);
-		int iPosFront = iPos + iSize;
-		int iFixed = this.puzzle.getFixedPosition(i);
-		
-		if (vOrient == iOrient) {
-			return vFixed == iFixed;
+		if (puzzle.getCarOrient(car) == puzzle.getCarOrient(next)) {
+			return carFixed == nextFixed;
 		}
 		
-		return vFixed >= iPos && vFixed < iPosFront;
+		int nextPos = state.getVariablePosition(next);
+		int nextPosFront = nextPos + puzzle.getCarSize(next);
+		
+		return carFixed >= nextPos && carFixed < nextPosFront;
 	}
 	
-	private boolean isBehind(int v, int i) {
-		boolean vOrient = this.puzzle.getCarOrient(v);
-		int vSize = this.puzzle.getCarSize(v);
-		int vPos = state.getVariablePosition(v);
-		int vPosFront = vPos + vSize;
-		int vFixed = this.puzzle.getFixedPosition(v);
+	private boolean isBehind(int car, int next) {
+		int carSize = puzzle.getCarSize(car);
+		int carPos = state.getVariablePosition(car);
+		int nextPos = state.getVariablePosition(next);
+		int nextSize = puzzle.getCarSize(next);
 		
-		boolean iOrient = this.puzzle.getCarOrient(i);
-		int iSize = this.puzzle.getCarSize(i);
-		int iPos = state.getVariablePosition(i);
-		int iPosFront = iPos + iSize;
-		int iFixed = this.puzzle.getFixedPosition(i);
-		
-		if (vOrient == iOrient) {
-			return iPos + iSize <= vPos;
+		if (this.puzzle.getCarOrient(car) == this.puzzle.getCarOrient(next)) {
+			return nextPos + nextSize <= carPos;
 		}
 		
-		return iFixed < vPos + vSize;
+		int nextFixed = puzzle.getFixedPosition(next);
+		
+		return nextFixed < carPos + carSize;
 	}
 
 }

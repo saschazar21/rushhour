@@ -10,7 +10,6 @@ import Heuristics.AdvancedHeuristic;
 import Heuristics.AdvancedHeuristic3;
 import Heuristics.BlockingHeuristic;
 import Heuristics.Heuristic;
-import Heuristics.TestHeuristic;
 import Heuristics.ZeroHeuristic;
 
 /**
@@ -61,7 +60,6 @@ public class RushHour {
 					new BlockingHeuristic(puzzles[i]),
 					// new AdvancedHeuristic(puzzles[i]),
 					new AdvancedHeuristic3(puzzles[i])
-					// new TestHeuristic(puzzles[i])
 				};
 
 			if (i == 0) {
