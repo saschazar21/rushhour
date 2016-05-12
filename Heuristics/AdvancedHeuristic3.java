@@ -62,8 +62,7 @@ public class AdvancedHeuristic3 implements Heuristic {
 		return value;
 	}
 	
-	private ArrayList<Integer> getInitialBlockingCars() {
-		
+	private ArrayList<Integer> getInitialBlockingCars() {		
 		ArrayList<Integer> blocking = new ArrayList<Integer>();
 		
 		boolean orientation = puzzle.getCarOrient(0);
@@ -100,7 +99,7 @@ public class AdvancedHeuristic3 implements Heuristic {
 			return 0;
 		}
 		
-		visited.add(0);
+		visited.add(car);
 		
 		int value = 1;
 		
