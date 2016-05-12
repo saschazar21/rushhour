@@ -17,7 +17,7 @@ import AStar.State;
  * interface. After thinking of an original heuristic, you should implement it
  * here, filling in the constructor and the <tt>getValue</tt> method.
  */
-public class NewHeuristic implements Heuristic {
+public class WorkInProgressHeuristic implements Heuristic {
 
 	private Puzzle puzzle;
 	private State state;
@@ -28,7 +28,7 @@ public class NewHeuristic implements Heuristic {
 	/**
 	 * This is the required constructor, which must be of the given form.
 	 */
-	public NewHeuristic(Puzzle puzzle) {
+	public WorkInProgressHeuristic(Puzzle puzzle) {
 		this.puzzle = puzzle;
 		this.numCars = this.puzzle.getNumCars();
 	}
