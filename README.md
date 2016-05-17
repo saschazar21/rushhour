@@ -7,13 +7,15 @@
 
 ## Abstract
 
-As an exercise for the course [Artificial Intelligence]() at the [University of Applied Sciences Upper Austria Campus Hagenberg]() we implemented the [A* algorithm]() to solve the rush hour puzzle.
+As an exercise for the course [Artificial Intelligence](https://en.wikipedia.org/wiki/Artificial_intelligence) at the [University of Applied Sciences Upper Austria Campus Hagenberg](https://www.fh-ooe.at/en/hagenberg-campus/) we implemented the [A* algorithm](https://en.wikipedia.org/wiki/A*_search_algorithm) to solve the rush hour puzzle.
 
 To reduce the number of nodes visited as well as the branching factor of the search, heuristics are used to make an educated guess on whether it is a good idea to visit a given node or not.
 
 ## The Game
 
 Rush Hour is a sliding puzzle game. The red car has to reach the exit, while every car on the board may be moved forward or backward as far as it can in each turn.
+
+![Rush Hour Puzzle](/puzzle.png)
 
 ## The A* Algorithm
 
@@ -93,13 +95,13 @@ getBlockingValue(car, requiredSpace) {
 
     forwardCosts = 0, backwardCosts = 0
 
-    if (canMoveForward(car, next, requiredSpace.forward) {
+    if (!canMoveForward(car, next, requiredSpace.forward) {
       forwardCosts = getBlockingValue(car, getRequiredSpace(car, next))
     } else if (isWallBlockingAhead(car, requiredSpace.forward)) {
       forwardCosts = INFINITY
     }
 
-    if (canMoveBackward(car, next, requiredSpace.backward) {
+    if (!canMoveBackward(car, next, requiredSpace.backward) {
       backwardCosts = getBlockingValue(car, getRequiredSpace(car, next))
     } else if (isWallBlockingBehind(car, requiredSpace.backward)) {
       backwardCosts = INFINITY
