@@ -15,7 +15,7 @@ To reduce the number of nodes visited as well as the branching factor of the sea
 
 Rush Hour is a sliding puzzle game. The red car has to reach the exit, while every car on the board may be moved forward or backward as far as it can in each turn.
 
-<img src="/puzzle.png" align="center" width="577">
+<img src="/puzzle.png" align="center" width="360">
 
 ## The A* Algorithm
 
