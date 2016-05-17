@@ -45,7 +45,7 @@ Every remaining car intersecting with the goal car counts one. This value plus o
 
 #### Idea
 
-The blocking heuristic already improves the algorithm by simply counting cars blocking the goal car. It doesn't take cars into account, that are blocking the blocking cars, or cars that are blocking the blocking blocking cars, or...
+The blocking heuristic already improves the algorithm by simply counting cars blocking the goal car. It doesn't take cars into account, that are blocking the blocking cars, or cars that are blocking the blocking blocking cars, or... Well, let's stop here.
 
 That's exactly what our heuristic does. It tries to count every blocking car recursively.
 
@@ -57,13 +57,14 @@ The idea did sound simple at a first glance. It soon turned out, that there were
 - How much space is actually available?
 - How many cars are blocking (there could me more than one, in two directions)?
 - Cars cannot be considered twice.
-- Cars could be aligned in the same way.
-- If there are multiple cars aligned in the same way, the space required to move has to be passed on recursively and reduced by the space available between equally aligned cars.
+- Cars could be aligned in the same way. If there are multiple cars aligned in the same way, the space required to move, has to be passed on recursively and reduced by the space available between equally aligned cars.
 - There are walls.
 
 #### Solution
 
-> Dummy code, explaining the entry point of the heuristic:
+> Note that the following code snippets are not actual code, it's simplified dummy code.
+
+##### Entry point of the heuristic:
 
 ```go
 getValue(State state) {
@@ -82,7 +83,7 @@ getValue(State state) {
 }
 ```
 
-> Dummy code, explaining the recursive identification of blocking cars
+##### Recursive identification of blocking cars:
 
 ```go
 getBlockingValue(car, requiredSpace) {
@@ -116,7 +117,7 @@ getBlockingValue(car, requiredSpace) {
 }
 ```
 
-### Drawbacks
+#### Drawbacks
 
 - The time required to calculate the heuristic value for a state is higher than that of the the blocking heuristic.
 
@@ -126,7 +127,7 @@ getBlockingValue(car, requiredSpace) {
 
 We could accomplish to implement an admissible and optimal heuristic, that visits fewer nodes than the blocking heuristic in most cases, but never visits more nodes.
 
-> The results can also be found in a separate file `RESULTS.txt` as plain text.
+> The results can also be found in a separate file [`RESULTS.txt`](https://github.com/saschazar21/rushhour/blob/master/RESULTS.txt) as plain text.
 
 | | Zero | | | Blocking | | | Advanced | | |
 |-----------|---------|------|--------|---------|------|--------|---------|------|-------
