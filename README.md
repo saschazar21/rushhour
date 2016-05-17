@@ -67,7 +67,7 @@ The idea did sound simple at a first glance. It soon turned out, that there were
 
 #### Solution
 
-> Code is worth a thausand words...  
+> Code is worth a thousand words...  
 > But please note, that the following code snippets are not actual code, it's simplified dummy code.  
 
 ##### Entry point of the heuristic:
@@ -128,7 +128,7 @@ You can see the full implementation in [`Heuristics/AdvancedHeuristic.java`](htt
 
 - The time required to calculate the heuristic value for a state is higher than that of the the blocking heuristic.
 
-- Cars cannot count twice. If a car was already considered as blocking, it must not count as blocking again, as the heuristic may overestimate in that case. If the car was already counted, it is considered as "moved", so it may, or may not be blocking another car.
+- Cars never be counted twice. If a car was already considered as blocking, it must not count as blocking again, as the heuristic may overestimate in that case. If the car was already counted, it is considered as "moved", so it may, or may not be blocking another car.
 
 #### Results
 
