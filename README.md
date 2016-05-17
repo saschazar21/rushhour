@@ -122,7 +122,7 @@ getBlockingValue(car, requiredSpace) {
 
 The results can also be found in a separate file `RESULTS.txt` as plain text.
 
-| | ZeroHeuristic | | | BlockingHeuristic | | | AdvancedHeuristic | | |
+| | Zero | | | Blocking | | | Advanced | | |
 |-----------|---------|------|--------|---------|------|--------|---------|------|-------
 |**name** | **nodes** | **dpth** | **br.fac** | **nodes** | **dpth** | **br.fac** | **nodes** | **dpth** | **br.fac**
 |Jam-1      |   11587 |    8 |  3.066 |    8678 |    8 |  2.950 |    4026 |    8 |  2.661
