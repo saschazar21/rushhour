@@ -62,7 +62,9 @@ The idea did sound simple at a first glance. It soon turned out, that there were
 
 #### Solution
 
-> Note that the following code snippets are not actual code, it's simplified dummy code.
+> Code is worth a thausand words...  
+>  
+> But please note, that the following code snippets are not actual code, it's simplified dummy code.  
 
 ##### Entry point of the heuristic:
 
