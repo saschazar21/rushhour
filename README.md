@@ -51,17 +51,17 @@ The idea did sound simple at a first glance. It soon turned out, that there were
 
 - How much space would a car need to move, to clear the way for another car?
 - How much space is actually available?
-- How many cars are blocking (there could me more than one)
+- How many cars are blocking (there could me more than one, in two directions)?
 - Cars cannot be considered twice.
 - Cars could be aligned in the same way.
-- If there are multiple cars aligned in the same way, the space needed to move has to be passed on recursively and reduced by the space available between equally aligned cars.
+- If there are multiple cars aligned in the same way, the space required to move has to be passed on recursively and reduced by the space available between equally aligned cars.
 - There are walls.
 
 #### Solution
 
 > Dummy code, explaining the entry point of the heuristic:
 
-```scala
+```go
 getValue(State state) {
   return 0 if state.isGoal()
 
@@ -80,7 +80,7 @@ getValue(State state) {
 
 > Dummy code, explaining the recursive identification of blocking cars
 
-```scala
+```go
 getBlockingValue(car, requiredSpace) {
   visited.add(car)
 
@@ -120,7 +120,9 @@ getBlockingValue(car, requiredSpace) {
 
 #### Results
 
-The results can also be found in a separate file `RESULTS.txt` as plain text.
+We could accomplish to implement an admissible and optimal heuristic, that visits fewer nodes than the blocking heuristic in most cases, but never visits more nodes.
+
+> The results can also be found in a separate file `RESULTS.txt` as plain text.
 
 | | Zero | | | Blocking | | | Advanced | | |
 |-----------|---------|------|--------|---------|------|--------|---------|------|-------
