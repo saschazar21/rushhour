@@ -19,7 +19,9 @@ Rush Hour is a sliding puzzle game. The red car has to reach the exit, while eve
 
 ## The A* Algorithm
 
-The A* algorithm uses an open and closed list to ensure, that nodes are not visited twice. Also the open list is sorted, that nodes with a lower heuristic value are visited first. In addition, when adding a node to the open list with the same depth, only the one with the better heuristic value will be kept.
+The A* algorithm uses an open and closed list to ensure, that nodes are not visited twice. Also the open list is sorted, that nodes with a lower heuristic value are visited first. In addition, when adding a node to the open list with the same depth, only the one with the better heuristic value will be kept.  
+
+It is worth to mention, that A* doesn't simply use the value returned by the heuristic, but also adds the previous path costs (in this case the depth) to it. The value that is actually used to sort the open list is `node_depth + node_heuristic_value`.
 
 ## Heuristics
 
@@ -33,9 +35,9 @@ The zero heuristic returns the same value for every node, which doesn't improve 
 
 ### Blocking Heuristic
 
-The blocking heuristic counts the number of cars, blocking the car (referred to as "goal car") that has to reach the exit. This value reflects the minimum required moves for a given node's state.
+The blocking heuristic counts the number of cars, blocking the red car (referred to as "goal car") that has to reach the exit. This value reflects the minimum required moves for a given node's state.
 
-For getting the desired value, we go through each car on the board, ignore any cars that are behind the goal car and those that are aligned in the same way. If there were an equally aligned car blocking the goal car, the puzzle would not be solvable.
+For getting the desired value, we go through each car on the board, ignore all cars that are behind the goal car and those that are aligned in the same way. If there were an equally aligned car blocking the goal car, the puzzle would not be solvable.
 
 Every remaining car intersecting with the goal car counts one. This value plus one for the goal car (to move the goal car to the exit, one move is required) is the result for a state.
 
