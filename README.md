@@ -21,7 +21,9 @@ Rush Hour is a sliding puzzle game. The red car has to reach the exit, while eve
 
 The A* algorithm uses an open and closed list to ensure, that nodes are not visited twice. Also the open list is sorted, that nodes with a lower heuristic value are visited first. In addition, when adding a node to the open list with the same depth, only the one with the better heuristic value will be kept.  
 
-It is worth to mention, that A* doesn't simply use the value returned by the heuristic, but also adds the previous path costs (in this case the depth) to it. The value that is actually used to sort the open list is `node_depth + node_heuristic_value`.
+It is worth to mention, that A* doesn't simply use the value returned by the heuristic, but also adds the previous path costs (in this case the depth) to it. The value that is actually used to sort the open list is `node_depth + node_heuristic_value`.  
+
+Take a look at our implementation in [`Astar/Astar.java`](https://github.com/saschazar21/rushhour/blob/master/AStar/AStar.java)
 
 ## Heuristics
 
@@ -63,7 +65,6 @@ The idea did sound simple at a first glance. It soon turned out, that there were
 #### Solution
 
 > Code is worth a thausand words...  
->  
 > But please note, that the following code snippets are not actual code, it's simplified dummy code.  
 
 ##### Entry point of the heuristic:
@@ -118,6 +119,7 @@ getBlockingValue(car, requiredSpace) {
   return value;
 }
 ```
+You can see the full implementation in [`Heuristics/AdvancedHeuristic.java`](https://github.com/saschazar21/rushhour/blob/master/Heuristics/AdvancedHeuristic.java).
 
 #### Drawbacks
 
