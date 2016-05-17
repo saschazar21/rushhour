@@ -42,6 +42,7 @@ The blocking heuristic counts the number of cars, blocking the red car (referred
 For getting the desired value, we go through each car on the board, ignore all cars that are behind the goal car and those that are aligned in the same way. If there were an equally aligned car blocking the goal car, the puzzle would not be solvable.
 
 Every remaining car intersecting with the goal car counts one. This value plus one for the goal car (to move the goal car to the exit, one move is required) is the result for a state.  
+  
 The implementation can be found in  [`Heuristics/BlockingHeuristic.java`](https://github.com/saschazar21/rushhour/blob/master/Heuristics/BlockingHeuristic.java).
 
 ### Advanced Heuristic
